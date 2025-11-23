@@ -39,7 +39,6 @@ jobs:
                   docker push ${{ env.ACR_NAME }}.azurecr.io/omada-controller:${{ env.IMAGE_TAG }}
 
             - name: Deploy to Web App
-              if: github.ref == 'refs/heads/develop'
               run: |
                   az webapp config container set \
                     --name ${{ secrets.APP_NAME }} \
