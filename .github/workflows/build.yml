@@ -45,3 +45,30 @@ jobs:
                     --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
                     --docker-custom-image-name ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
                     --docker-registry-server-url https://${{ env.ACR_NAME }}.azurecr.io
+                    
+                    # Set startup port (Omada defaults to 8088 for HTTP, 8043 for HTTPS)
+                    az webapp config appsettings set \
+                        --name ${{ secrets.APP_NAME }} \
+                        --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+                        --settings WEBSITES_PORT=8088 TZ=Etc/UTC
+
+                    # Optional: mount Azure Storage for persistence
+                    az webapp config storage-account add \
+                        --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+                        --name ${{ secrets.APP_NAME }} \
+                        --custom-id omada-data \
+                        --storage-type AzureFiles \
+                        --account-name matigapwseasa \
+                        --share-name omada-data \
+                        --access-key ${{ secrets.SA_ACCESS_KEY }} \
+                        --mount-path /opt/tplink/EAPController/data
+
+                    az webapp config storage-account add \
+                        --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+                        --name ${{ secrets.APP_NAME }} \
+                        --custom-id omada-logs \
+                        --storage-type AzureFiles \
+                        --account-name matigapwseasa \
+                        --share-name omada-logs \
+                        --access-key ${{ secrets.SA_ACCESS_KEY }} \
+                        --mount-path /opt/tplink/EAPController/logs
